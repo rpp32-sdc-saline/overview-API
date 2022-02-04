@@ -1,38 +1,46 @@
-//Too slow
+const fs = require("fs");
+const path = require("path");
+const csv = require("fast-csv");
+const { Pool, Client } = require("pg");
+const process = require("process");
 
-// const fs = require("fs");
-// const { Pool } = require("pg");
-// const fastcsv = require("fast-csv");
+const pool = new Pool({
+  user: "josephnahm",
+  password: null,
+  host: "localhost",
+  port: 5432,
+  database: "sdc",
+  idleTimeoutMillis: 0,
+});
 
-// var stream = fs.createReadStream("csv/product.csv");
-// var csvData = [];
-// var csvStream = fastcsv
-//   .parse()
-//   .on("data", (data) => csvData.push(data))
-//   .on("end", () => {
-//     csvData.shift();
-
-//     const pool = new Pool({
-//       user: "josephnahm",
-//       password: null,
-//       host: "localhost",
-//       port: 5432,
-//       database: "overview",
-//     });
-
-//     const query =
-//       "INSERT INTO products (name, slogan, description, category, default_price) VALUES ($1, $2, $3, $4, $5)";
-
-//     (async () => {
-//       const client = await pool.connect();
-//       try {
-//         csvData.forEach(async (row) => {
-//           const fields = [...row.slice(1, -1), parseInt(row[row.length - 1])];
-//           const res = await client.query(query, fields);
-//         });
-//       } finally {
-//         client.release();
-//       }
-//     })().catch((err) => console.log(err.stack));
-//   });
-// stream.pipe(csvStream);
+(async () => {
+  const client = await pool.connect();
+  try {
+    const queryText =
+      "INSERT INTO products (id,name,slogan,description,category,default_price) VALUES($1,$2,$3,$4,$5,$6)";
+    fs.createReadStream(path.resolve(__dirname, "..", "csv", "product.csv"))
+      .pipe(csv.parse({ headers: true }))
+      .on("error", (error) => console.error(error))
+      .on("data", async (row) => {
+        try {
+          await client.query(queryText, [
+            parseInt(row.id),
+            row.name,
+            row.slogan,
+            row.description,
+            row.category,
+            parseInt(row.default_price),
+          ]);
+          console.log(row.id);
+        } catch (error) {
+          console.error(error.message);
+          process.exit();
+        }
+      })
+      .on("end", (rowCount) => console.log(`Parsed ${rowCount} rows`));
+  } catch (e) {
+    throw e;
+  } finally {
+    client.release();
+  }
+})().catch((e) => console.error(e.stack));
