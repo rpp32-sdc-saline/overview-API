@@ -1,3 +1,5 @@
+// UPDATE products SET features = features || '{"example":"test","joe":"schmo"}' ::jsonb WHERE id=1000013;
+
 const fs = require("fs");
 const path = require("path");
 const csv = require("fast-csv");
@@ -19,27 +21,27 @@ var data = [];
 (async () => {
   const client = await pool.connect();
   try {
-    console.log("1");
     const readable = fs
-      .createReadStream(path.resolve(__dirname, "..", "csv", "product.csv"))
+      .createReadStream(path.resolve(__dirname, "..", "csv", "styles.csv"))
       .pipe(csv.parse({ headers: true }))
       .on("error", (error) => console.error(error))
       .on("data", async (row) => {
         try {
           data.push([
             parseInt(row.id),
+            parseInt(row.productId),
             row.name,
-            row.slogan,
-            row.description,
-            row.category,
-            parseInt(row.default_price),
+            parseInt(row.sale_price) || null,
+            parseInt(row.original_price),
+            parseInt(row.default_style) ? true : false,
+            "[]",
             "[]",
           ]);
           if (data.length === 100) {
             readable.pause();
             await client.query(
               format(
-                "INSERT INTO products (id,name,slogan,description,category,default_price, features) VALUES %L",
+                "INSERT INTO styles (id,productId,name,sale_price,original_price,default_style,photos,skus) VALUES %L",
                 data
               )
             );
@@ -55,7 +57,7 @@ var data = [];
       .on("end", async (rowCount) => {
         await client.query(
           format(
-            "INSERT INTO products (id,name,slogan,description,category,default_price,features) VALUES %L",
+            "INSERT INTO styles (id,productId,name,sale_price,original_price,default_style,photos,skus) VALUES %L",
             data
           )
         );

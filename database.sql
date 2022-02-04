@@ -13,7 +13,20 @@ CREATE TABLE products (
   description TEXT,
   category TEXT,
   default_price INT,
-  features json
+  features jsonb
+);
+
+id,productId,name,sale_price,original_price,default_style
+
+CREATE TABLE styles (
+  id INT UNIQUE NOT NULL PRIMARY KEY,
+  productId INT NOT NULL,
+  name TEXT,
+  sale_price INT,
+  original_price INT,
+  default_style boolean,
+  photos jsonb,
+  skus jsonb
 );
 
 -- CREATE TABLE features (
