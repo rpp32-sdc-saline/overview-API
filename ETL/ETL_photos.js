@@ -15,53 +15,42 @@ const pool = new Pool({
 });
 
 var data = [];
+var curr = 1;
 
 (async () => {
   const client = await pool.connect();
   try {
     const readable = fs
-      .createReadStream(path.resolve(__dirname, "..", "csv", "styles.csv"))
-      .pipe(csv.parse({ headers: true }))
+      .createReadStream(path.resolve(__dirname, "..", "csv", "photos.csv"))
+      .pipe(csv.parse({ headers: true, ignoreEmpty: true }))
       .on("error", (error) => {
-        console.error(error.message);
+        console.error(error);
         process.exit();
       })
       .on("data", async (row) => {
         try {
-          data.push([
-            parseInt(row.id),
-            parseInt(row.productId),
-            row.name,
-            parseInt(row.sale_price) || null,
-            parseInt(row.original_price),
-            parseInt(row.default_style) ? true : false,
-            "[]",
-            "[]",
-          ]);
-          if (data.length === 100) {
+          const id = parseInt(row.styleId);
+          if (id !== curr) {
             readable.pause();
-            await client.query(
-              format(
-                "INSERT INTO styles (id,productId,name,sale_price,original_price,default_style,photos,skus) VALUES %L",
-                data
-              )
-            );
+            await client.query("UPDATE styles SET photos = $1 WHERE id=$2", [
+              JSON.stringify(data),
+              curr,
+            ]);
+            console.log(curr);
             readable.resume();
-            console.log(data[0][0]);
             data = [];
+            curr = id;
           }
+          data.push({
+            url: row.url,
+            thumbnail_url: row.thumbnail_url,
+          });
         } catch (error) {
           console.error(error.message);
           process.exit();
         }
       })
       .on("end", async (rowCount) => {
-        await client.query(
-          format(
-            "INSERT INTO styles (id,productId,name,sale_price,original_price,default_style,photos,skus) VALUES %L",
-            data
-          )
-        );
         console.log(`Parsed ${rowCount} rows`);
         client.release();
         process.exit();

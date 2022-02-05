@@ -10,52 +10,47 @@ const pool = new Pool({
   password: null,
   host: "localhost",
   port: 5432,
-  database: "sdc",
+  database: "sdc2",
   idleTimeoutMillis: 0,
 });
 
-var data = [];
+var data = {};
+var curr = 1;
 
 (async () => {
   const client = await pool.connect();
   try {
-    console.log("1");
     const readable = fs
       .createReadStream(path.resolve(__dirname, "..", "csv", "skus.csv"))
-      .pipe(csv.parse({ headers: true }))
+      .pipe(csv.parse({ headers: true, ignoreEmpty: true }))
       .on("error", (error) => {
-        console.error(error.message);
+        console.error(error);
         process.exit();
       })
       .on("data", async (row) => {
         try {
-          data.push([
-            parseInt(row.id),
-            parseInt(row.styleId),
-            row.size,
-            parseInt(row.quantity),
-          ]);
-          if (data.length === 100) {
+          const id = parseInt(row.styleId);
+          if (id !== curr) {
             readable.pause();
-            await client.query(
-              format(
-                "INSERT INTO skus (id,styleid,size,quantity) VALUES %L",
-                data
-              )
-            );
+            await client.query("UPDATE styles SET skus = $1 WHERE id=$2", [
+              JSON.stringify(data),
+              curr,
+            ]);
+            console.log(curr);
             readable.resume();
-            console.log(data[0][0]);
-            data = [];
+            data = {};
+            curr = id;
           }
+          data[row.id] = {
+            size: row.size,
+            quantity: row.quantity,
+          };
         } catch (error) {
           console.error(error.message);
           process.exit();
         }
       })
       .on("end", async (rowCount) => {
-        await client.query(
-          format("INSERT INTO skus (id,styleid,size,quantity) VALUES %L", data)
-        );
         console.log(`Parsed ${rowCount} rows`);
         client.release();
         process.exit();

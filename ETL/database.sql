@@ -1,10 +1,9 @@
-CREATE DATABASE sdc;
+CREATE DATABASE sdc2;
 
-\c sdc;
+\c sdc2;
 
 DROP TABLE IF EXISTS products;
-
-
+DROP TABLE IF EXISTS styles;
 
 CREATE TABLE products (
   id INT UNIQUE NOT NULL PRIMARY KEY,
@@ -16,8 +15,6 @@ CREATE TABLE products (
   features jsonb
 );
 
-id,productId,name,sale_price,original_price,default_style
-
 CREATE TABLE styles (
   id INT UNIQUE NOT NULL PRIMARY KEY,
   productId INT NOT NULL,
@@ -27,25 +24,4 @@ CREATE TABLE styles (
   default_style boolean,
   photos jsonb,
   skus jsonb
-);
-
-CREATE TABLE features (
-  id INT UNIQUE NOT NULL PRIMARY KEY,
-  productId INT NOT NULL,
-  feature TEXT NOT NULL,
-  value TEXT
-);
-
-CREATE TABLE skus (
-  id INT UNIQUE NOT NULL PRIMARY KEY,
-  styleId INT NOT NULL,
-  size TEXT NOT NULL,
-  quantity INT NOT NULL
-);
-
-CREATE TABLE photos (
-  id INT UNIQUE NOT NULL PRIMARY KEY,
-  styleId INT NOT NULL,
-  url TEXT,
-  thumbnail_url TEXT
 );
