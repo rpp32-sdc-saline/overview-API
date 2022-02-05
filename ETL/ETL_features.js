@@ -1,5 +1,3 @@
-// UPDATE products SET features = features || '{"example":"test","joe":"schmo"}' ::jsonb WHERE id=1000013;
-
 const fs = require("fs");
 const path = require("path");
 const csv = require("fast-csv");
@@ -21,27 +19,27 @@ var data = [];
 (async () => {
   const client = await pool.connect();
   try {
+    console.log("1");
     const readable = fs
-      .createReadStream(path.resolve(__dirname, "..", "csv", "styles.csv"))
+      .createReadStream(path.resolve(__dirname, "..", "csv", "features.csv"))
       .pipe(csv.parse({ headers: true }))
-      .on("error", (error) => console.error(error))
+      .on("error", (error) => {
+        console.error(error.message);
+        process.exit();
+      })
       .on("data", async (row) => {
         try {
           data.push([
             parseInt(row.id),
-            parseInt(row.productId),
-            row.name,
-            parseInt(row.sale_price) || null,
-            parseInt(row.original_price),
-            parseInt(row.default_style) ? true : false,
-            "[]",
-            "[]",
+            parseInt(row.product_id),
+            row.feature,
+            row.value,
           ]);
           if (data.length === 100) {
             readable.pause();
             await client.query(
               format(
-                "INSERT INTO styles (id,productId,name,sale_price,original_price,default_style,photos,skus) VALUES %L",
+                "INSERT INTO features (id,productid,feature, value) VALUES %L",
                 data
               )
             );
@@ -57,13 +55,13 @@ var data = [];
       .on("end", async (rowCount) => {
         await client.query(
           format(
-            "INSERT INTO styles (id,productId,name,sale_price,original_price,default_style,photos,skus) VALUES %L",
+            "INSERT INTO features (id,productid,feature, value) VALUES %L",
             data
           )
         );
         console.log(`Parsed ${rowCount} rows`);
         client.release();
-        return;
+        process.exit();
       });
   } catch (e) {
     throw e;

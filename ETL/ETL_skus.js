@@ -21,25 +21,25 @@ var data = [];
   try {
     console.log("1");
     const readable = fs
-      .createReadStream(path.resolve(__dirname, "..", "csv", "product.csv"))
+      .createReadStream(path.resolve(__dirname, "..", "csv", "skus.csv"))
       .pipe(csv.parse({ headers: true }))
-      .on("error", (error) => console.error(error))
+      .on("error", (error) => {
+        console.error(error.message);
+        process.exit();
+      })
       .on("data", async (row) => {
         try {
           data.push([
             parseInt(row.id),
-            row.name,
-            row.slogan,
-            row.description,
-            row.category,
-            parseInt(row.default_price),
-            "[]",
+            parseInt(row.styleId),
+            row.size,
+            parseInt(row.quantity),
           ]);
           if (data.length === 100) {
             readable.pause();
             await client.query(
               format(
-                "INSERT INTO products (id,name,slogan,description,category,default_price, features) VALUES %L",
+                "INSERT INTO skus (id,styleid,size,quantity) VALUES %L",
                 data
               )
             );
@@ -54,14 +54,11 @@ var data = [];
       })
       .on("end", async (rowCount) => {
         await client.query(
-          format(
-            "INSERT INTO products (id,name,slogan,description,category,default_price,features) VALUES %L",
-            data
-          )
+          format("INSERT INTO skus (id,styleid,size,quantity) VALUES %L", data)
         );
         console.log(`Parsed ${rowCount} rows`);
         client.release();
-        return;
+        process.exit();
       });
   } catch (e) {
     throw e;
