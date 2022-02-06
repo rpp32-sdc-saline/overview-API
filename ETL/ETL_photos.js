@@ -22,7 +22,7 @@ var curr = 1;
   try {
     const readable = fs
       .createReadStream(path.resolve(__dirname, "..", "csv", "photos.csv"))
-      .pipe(csv.parse({ headers: true, ignoreEmpty: true }))
+      .pipe(csv.parse({ headers: true, quote: null }))
       .on("error", (error) => {
         console.error(error);
         process.exit();
@@ -42,12 +42,14 @@ var curr = 1;
             curr = id;
           }
           data.push({
-            url: row.url,
-            thumbnail_url: row.thumbnail_url,
+            url: JSON.parse(row.url),
+            thumbnail_url: JSON.parse(row.thumbnail_url),
           });
         } catch (error) {
-          console.error(error.message);
-          process.exit();
+          data.push({
+            url: JSON.parse(row.url),
+            thumbnail_url: row.thumbnail_url.slice(1),
+          });
         }
       })
       .on("end", async (rowCount) => {
