@@ -21,33 +21,35 @@ var curr = 1;
   const client = await pool.connect();
   try {
     const readable = fs
-      .createReadStream(path.resolve(__dirname, "..", "csv", "features.csv"))
-      .pipe(csv.parse({ headers: true, ignoreEmpty: true }))
+      .createReadStream(path.resolve(__dirname, "..", "csv", "photos.csv"))
+      .pipe(csv.parse({ headers: true, quote: null }))
       .on("error", (error) => {
         console.error(error);
         process.exit();
       })
       .on("data", async (row) => {
         try {
-          const id = parseInt(row.product_id);
+          const id = parseInt(row.styleId);
           if (id !== curr) {
             readable.pause();
-            await client.query(
-              "UPDATE products SET features = $1 WHERE id=$2",
-              [JSON.stringify(data), curr]
-            );
+            await client.query("UPDATE styles SET photos = $1 WHERE id=$2", [
+              JSON.stringify(data),
+              curr,
+            ]);
             console.log(curr);
             readable.resume();
             data = [];
             curr = id;
           }
           data.push({
-            feature: row.feature,
-            value: row.value !== "null" ? row.value : null,
+            url: JSON.parse(row.url),
+            thumbnail_url: JSON.parse(row.thumbnail_url),
           });
         } catch (error) {
-          console.error(error.message);
-          process.exit();
+          data.push({
+            url: JSON.parse(row.url),
+            thumbnail_url: row.thumbnail_url.slice(1),
+          });
         }
       })
       .on("end", async (rowCount) => {

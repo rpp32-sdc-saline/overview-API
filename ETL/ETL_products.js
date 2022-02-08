@@ -10,7 +10,7 @@ const pool = new Pool({
   password: null,
   host: "localhost",
   port: 5432,
-  database: "sdc",
+  database: "sdc2",
   idleTimeoutMillis: 0,
 });
 
@@ -19,7 +19,6 @@ var data = [];
 (async () => {
   const client = await pool.connect();
   try {
-    console.log("1");
     const readable = fs
       .createReadStream(path.resolve(__dirname, "..", "csv", "product.csv"))
       .pipe(csv.parse({ headers: true }))
@@ -36,12 +35,13 @@ var data = [];
             row.description,
             row.category,
             parseInt(row.default_price),
+            "[]",
           ]);
           if (data.length === 100) {
             readable.pause();
             await client.query(
               format(
-                "INSERT INTO products (id,name,slogan,description,category,default_price, features) VALUES %L",
+                "INSERT INTO products (id,name,slogan,description,category,default_price,features) VALUES %L",
                 data
               )
             );

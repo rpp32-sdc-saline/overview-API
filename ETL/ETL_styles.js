@@ -10,7 +10,7 @@ const pool = new Pool({
   password: null,
   host: "localhost",
   port: 5432,
-  database: "sdc",
+  database: "sdc2",
   idleTimeoutMillis: 0,
 });
 
@@ -35,6 +35,8 @@ var data = [];
             parseInt(row.sale_price) || null,
             parseInt(row.original_price),
             parseInt(row.default_style) ? true : false,
+            "[]",
+            "[]",
           ]);
           if (data.length === 100) {
             readable.pause();

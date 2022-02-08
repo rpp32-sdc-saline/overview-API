@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon server/server.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -23,5 +24,10 @@
     "fs": "0.0.1-security",
     "pg": "^8.7.1",
     "pg-format": "^1.0.4"
+  },
+  "devDependencies": {
+    "jest": "^27.5.0",
+    "nodemon": "^2.0.15",
+    "supertest": "^6.2.2"
   }
 }
