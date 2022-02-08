@@ -23,5 +23,9 @@
     "fs": "0.0.1-security",
     "pg": "^8.7.1",
     "pg-format": "^1.0.4"
+  },
+  "devDependencies": {
+    "jest": "^27.5.0",
+    "supertest": "^6.2.2"
   }
 }
