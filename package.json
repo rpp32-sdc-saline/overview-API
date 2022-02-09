@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon server/server.js",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll --coverage"
   },
   "repository": {
     "type": "git",
