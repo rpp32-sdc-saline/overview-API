@@ -20,7 +20,7 @@ pool.getProduct = async function (product_id) {
   const product = await pool.query("SELECT * FROM products WHERE id = $1", [
     product_id,
   ]);
-  return product.rows;
+  return product.rows[0];
 };
 
 pool.getStyle = async function (product_id) {
