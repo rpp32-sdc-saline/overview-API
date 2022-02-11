@@ -32,7 +32,6 @@ module.exports = function (pool) {
       const style = await pool.getStyle(product_id);
       res.json({ product_id, results: style });
     } catch (err) {
-      console.log(err.message);
       res.status(400).send(err.message);
     }
   });
