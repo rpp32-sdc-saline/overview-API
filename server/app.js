@@ -6,6 +6,17 @@ module.exports = function (pool) {
   app.use(express.json());
   app.use(cors());
 
+  app.get("/overview/:product_id", async (req, res) => {
+    try {
+      const { product_id } = req.params;
+      const product = await pool.getProduct(product_id);
+      const style = await pool.getStyle(product_id);
+      res.json({ product, styles: { product_id, results: style } });
+    } catch (err) {
+      res.status(400).send(err.message);
+    }
+  });
+
   app.get("/products", async (req, res) => {
     try {
       const { page = 1, count = 5 } = req.query;
