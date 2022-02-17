@@ -6,7 +6,8 @@
   "scripts": {
     "start": "nodemon server/server.js",
     "test": "jest --watchAll --coverage",
-    "stress": "k6 run loadTesting/stress.js"
+    "stress": "k6 run loadTesting/stress.js",
+    "newrelic" :"K6_STATSD_ENABLE_TAGS=true k6 run --out statsd loadTesting/stress.js"
   },
   "repository": {
     "type": "git",
