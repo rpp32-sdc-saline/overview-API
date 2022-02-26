@@ -1,17 +1,34 @@
 const express = require("express");
 const cors = require("cors");
+const client = require("./redis");
+
+(async () => {await client.connect()})();
+
 
 module.exports = function (pool) {
   const app = express();
   app.use(express.json());
   app.use(cors());
 
-  app.get("/overview/:product_id", async (req, res) => {
+  //Cache middleware
+  async function cache(req, res, next) {
+    const { product_id } = req.params;
+    const value = await client.get(product_id);
+    if (value) {
+      res.send(JSON.parse(value))
+    } else{
+      next()
+    }
+  }
+
+  app.get("/overview/:product_id", cache, async (req, res) => {
     try {
       const { product_id } = req.params;
       const product = await pool.getProduct(product_id);
       const style = await pool.getStyle(product_id);
-      res.json({ product, styles: { product_id, results: style } });
+      const data = { product, styles: { product_id, results: style } };
+      await client.set(product_id, JSON.stringify(data));
+      res.json(data);
     } catch (err) {
       res.status(400).send(err.message);
     }

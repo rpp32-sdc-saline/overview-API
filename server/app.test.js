@@ -1,6 +1,6 @@
 const request = require("supertest");
 const makeApp = require("./app");
-const { pool } = require("./db");
+const { pool } = require("./postgres");
 const testResults = require("./test.json");
 
 const getProducts = jest.fn();

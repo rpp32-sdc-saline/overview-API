@@ -1,5 +1,5 @@
 const makeApp = require("./app");
-const { pool } = require("./db");
+const { pool } = require("./postgres");
 const port = 3000;
 
 const app = makeApp(pool);

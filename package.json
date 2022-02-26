@@ -7,7 +7,7 @@
     "start": "nodemon server/server.js",
     "test": "jest --watchAll --coverage",
     "stress": "k6 run loadTesting/stress.js",
-    "newrelic" :"K6_STATSD_ENABLE_TAGS=true k6 run --out statsd loadTesting/stress.js"
+    "newrelic": "K6_STATSD_ENABLE_TAGS=true k6 run --out statsd loadTesting/stress.js"
   },
   "repository": {
     "type": "git",
@@ -26,7 +26,8 @@
     "fast-csv": "^4.3.6",
     "fs": "0.0.1-security",
     "pg": "^8.7.1",
-    "pg-format": "^1.0.4"
+    "pg-format": "^1.0.4",
+    "redis": "^4.0.4"
   },
   "devDependencies": {
     "jest": "^27.5.0",

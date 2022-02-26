@@ -7,7 +7,7 @@ const maxId = 1000012;
 //Stress Test
 export const options = {
   stages: [
-    { duration: "1m", target: 1000 },
+    { duration: "1m", target: 10000 },
   ],
   // insecureSkipTLSVerify: true,
   // noConnectionReuse: false,
