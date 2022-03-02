@@ -1,11 +1,19 @@
 const { Pool } = require("pg");
 
+// const pool = new Pool({
+//   user: "josephnahm",
+//   password: null,
+//   host: "localhost",
+//   port: 5432,
+//   database: "sdc2",
+// });
+
 const pool = new Pool({
   user: "josephnahm",
-  password: null,
-  host: "localhost",
+  password: "chestnut1",
+  host: "54.241.97.56",
   port: 5432,
-  database: "sdc2",
+  database: "postgres",
 });
 
 pool.getProducts = async function (page, count) {
