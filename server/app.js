@@ -21,6 +21,10 @@ module.exports = function (pool) {
     }
   }
 
+  app.get("/", (req, res) => {
+    res.send("Welcome to the Overview API");
+  })
+
   app.get("/overview/:product_id", cache, async (req, res) => {
     try {
       const { product_id } = req.params;
