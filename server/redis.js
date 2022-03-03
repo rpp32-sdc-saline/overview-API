@@ -1,4 +1,8 @@
 const redis = require('redis');
-const REDIS_PORT = process.env.PORT || 6379;
+const redisHost = JSON.parse(process.env.IPS).redis;
 
-module.exports = redis.createClient(REDIS_PORT);
+//local redis server
+// module.exports = redis.createClient(6379);
+
+//remote server
+module.exports = redis.createClient({url: `redis://default@${redisHost}:6379`});
