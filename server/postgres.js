@@ -1,8 +1,8 @@
 const { Pool } = require("pg");
-const postgresHost = JSON.parse(process.env.IPS).postgres;
-const postgresPwd = JSON.parse(process.env.IPS).pwd;
+const postgresHost = JSON.parse(process.env.IPS).pgIP;
+const postgresPwd = JSON.parse(process.env.IPS).pgPwd;
 
-//local development
+// local development
 // const pool = new Pool({
 //   user: "josephnahm",
 //   password: null,
