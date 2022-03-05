@@ -1,10 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const client = require("./redis");
-client.on('error', (err) => console.log('Redis Client Error', err));
+const fs = require("fs");
+client.on("error", (err) => console.log("Redis Client Error", err));
+const loaderToken = process.env.IPS && JSON.parse(process.env.IPS).loaderToken;
 
-(async () => {await client.connect()})();
-
+(async () => {
+  await client.connect();
+})();
 
 module.exports = function (pool) {
   const app = express();
@@ -13,8 +16,8 @@ module.exports = function (pool) {
 
   //generates a random id middleware
   function randomid(req, res, next) {
-    req.params = { product_id : Math.floor(Math.random() * 1000012).toString() }
-    next()
+    req.params = { product_id: Math.floor(Math.random() * 1000012).toString() };
+    next();
   }
 
   //Cache middleware
@@ -22,19 +25,22 @@ module.exports = function (pool) {
     const { product_id } = req.params;
     const value = await client.get(product_id);
     if (value) {
-      res.send(JSON.parse(value))
-    } else{
-      next()
+      res.send(JSON.parse(value));
+    } else {
+      next();
     }
   }
 
   app.get("/", (req, res) => {
     res.send("Welcome to the Overview API");
-  })
+  });
 
-  app.get("/loaderio-3bfaaf88c8e0dab190ae2a3416023785", (req, res) => {
-    res.sendFile(__dirname + '/loader.txt');
-  })
+  app.get(`/${loaderToken}`, (req, res) => {
+    fs.writeFile(__dirname + "/loader.txt", loaderToken, "utf-8", function (err, data) {
+      if (err) throw err;
+      res.sendFile(__dirname + "/loader.txt");
+    });
+  });
 
   app.get("/overview/test", [randomid, cache], async (req, res) => {
     try {
@@ -47,7 +53,7 @@ module.exports = function (pool) {
     } catch (err) {
       res.status(400).send(err.message);
     }
-  })
+  });
 
   app.get("/overview/:product_id", cache, async (req, res) => {
     try {
