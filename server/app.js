@@ -11,6 +11,12 @@ module.exports = function (pool) {
   app.use(express.json());
   app.use(cors());
 
+  //generates a random id middleware
+  function randomid(req, res, next) {
+    req.params = { product_id : Math.floor(Math.random() * 1000012).toString() }
+    next()
+  }
+
   //Cache middleware
   async function cache(req, res, next) {
     const { product_id } = req.params;
@@ -24,6 +30,19 @@ module.exports = function (pool) {
 
   app.get("/", (req, res) => {
     res.send("Welcome to the Overview API");
+  })
+
+  app.get("/overview/test", [randomid, cache], async (req, res) => {
+    try {
+      const { product_id } = req.params;
+      const product = await pool.getProduct(product_id);
+      const style = await pool.getStyle(product_id);
+      const data = { product, styles: { product_id, results: style } };
+      await client.set(product_id, JSON.stringify(data));
+      res.json(data);
+    } catch (err) {
+      res.status(400).send(err.message);
+    }
   })
 
   app.get("/overview/:product_id", cache, async (req, res) => {
