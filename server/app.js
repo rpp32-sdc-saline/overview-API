@@ -32,6 +32,10 @@ module.exports = function (pool) {
     res.send("Welcome to the Overview API");
   })
 
+  app.get("/loaderio-3bfaaf88c8e0dab190ae2a3416023785", (req, res) => {
+    res.sendFile(__dirname + '/loader.txt');
+  })
+
   app.get("/overview/test", [randomid, cache], async (req, res) => {
     try {
       const { product_id } = req.params;

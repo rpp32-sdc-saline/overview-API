@@ -1,22 +1,21 @@
 const { Pool } = require("pg");
-const postgresHost = JSON.parse(process.env.IPS).pgIP;
-const postgresPwd = JSON.parse(process.env.IPS).pgPwd;
+// const postgresHost = JSON.parse(process.env.IPS).pgIP;
+// const postgresPwd = JSON.parse(process.env.IPS).pgPwd;
 
-// local development
 // const pool = new Pool({
 //   user: "josephnahm",
-//   password: null,
-//   host: "localhost",
+//   password: postgresPwd,
+//   host: postgresHost,
 //   port: 5432,
-//   database: "sdc2",
+//   database: "postgres",
 // });
 
 const pool = new Pool({
   user: "josephnahm",
-  password: postgresPwd,
-  host: postgresHost,
+  password: null,
+  host: "localhost",
   port: 5432,
-  database: "postgres",
+  database: "sdc2",
 });
 
 pool.getProducts = async function (page, count) {
