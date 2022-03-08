@@ -42,7 +42,7 @@ module.exports = function (pool) {
     });
   });
 
-  app.get("/overview/test", [randomid, cache], async (req, res) => {
+  app.get("/products/overview/test", [randomid, cache], async (req, res) => {
     try {
       const { product_id } = req.params;
       const product = await pool.getProduct(product_id);
@@ -55,7 +55,7 @@ module.exports = function (pool) {
     }
   });
 
-  app.get("/overview/:product_id", cache, async (req, res) => {
+  app.get("/products/overview/:product_id", cache, async (req, res) => {
     try {
       const { product_id } = req.params;
       const product = await pool.getProduct(product_id);
