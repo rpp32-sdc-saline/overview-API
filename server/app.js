@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const client = require("./redis");
+const compression = require("compression");
 const fs = require("fs");
 client.on("error", (err) => console.log("Redis Client Error", err));
 const loaderToken = process.env.IPS && JSON.parse(process.env.IPS).loaderToken;
@@ -13,6 +14,7 @@ module.exports = function (pool) {
   const app = express();
   app.use(express.json());
   app.use(cors());
+  app.use(compression({level: 6}));
 
   //generates a random id middleware
   function randomid(req, res, next) {
